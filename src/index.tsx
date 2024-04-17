@@ -24,6 +24,27 @@ const ConcurrentSound = ConcurrentSoundModule
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return ConcurrentSound.multiply(a, b);
+export type TInput = {
+  uri?: string;
+  key?: string;
+};
+
+export type TInputSeek = TInput & {
+  to: number;
+};
+
+export function play({ uri, key }: TInput): Promise<void> {
+  return ConcurrentSound.play(key ?? uri, uri);
+}
+
+export function pause({ uri, key }: TInput): Promise<void> {
+  return ConcurrentSound.pause(key ?? uri, uri);
+}
+
+export function seek({ uri, key, to }: TInputSeek): Promise<boolean> {
+  return ConcurrentSound.seek(key ?? uri, uri, to);
+}
+
+export function setVolume({ uri, key, to }: TInputSeek): Promise<void> {
+  return ConcurrentSound.setVolume(key ?? uri, uri, to);
 }

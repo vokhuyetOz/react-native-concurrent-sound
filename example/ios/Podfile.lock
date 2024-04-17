@@ -944,11 +944,10 @@ PODS:
   - React-Mapbuffer (0.73.6):
     - glog
     - React-debug
-  - react-native-concurrent-sound (0.1.0):
-    - glog
-    - RCT-Folly (= 2022.05.16.00)
+  - react-native-concurrent-sound (0.0.1):
     - React-Core
-    - SwiftySound
+  - react-native-document-picker (9.1.2):
+    - React-Core
   - React-nativeconfig (0.73.6)
   - React-NativeModulesApple (0.73.6):
     - glog
@@ -1117,7 +1116,6 @@ PODS:
     - React-logger (= 0.73.6)
     - React-perflogger (= 0.73.6)
   - SocketRocket (0.6.1)
-  - SwiftySound (1.3.0)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -1174,6 +1172,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - react-native-concurrent-sound (from `../..`)
+  - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -1211,7 +1210,6 @@ SPEC REPOS:
     - libevent
     - OpenSSL-Universal
     - SocketRocket
-    - SwiftySound
 
 EXTERNAL SOURCES:
   boost:
@@ -1271,6 +1269,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   react-native-concurrent-sound:
     :path: "../.."
+  react-native-document-picker:
+    :path: "../node_modules/react-native-document-picker"
   React-nativeconfig:
     :path: "../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -1354,7 +1354,8 @@ SPEC CHECKSUMS:
   React-jsinspector: 85583ef014ce53d731a98c66a0e24496f7a83066
   React-logger: 3eb80a977f0d9669468ef641a5e1fabbc50a09ec
   React-Mapbuffer: 84ea43c6c6232049135b1550b8c60b2faac19fab
-  react-native-concurrent-sound: 45b3f9524a02102c0fced41876149f64797463a3
+  react-native-concurrent-sound: 26a6967a38fc4e0cad9267c3f47bbcb119a03a85
+  react-native-document-picker: 86bcfb8e2c94cd587ca9feb0049831b806df590d
   React-nativeconfig: b4d4e9901d4cabb57be63053fd2aa6086eb3c85f
   React-NativeModulesApple: cd26e56d56350e123da0c1e3e4c76cb58a05e1ee
   React-perflogger: 5f49905de275bac07ac7ea7f575a70611fa988f2
@@ -1376,7 +1377,6 @@ SPEC CHECKSUMS:
   React-utils: d16c1d2251c088ad817996621947d0ac8167b46c
   ReactCommon: 2aa35648354bd4c4665b9a5084a7d37097b89c10
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  SwiftySound: b6d7355bc15f5eef1a52695ad40e9ac5597d907b
   Yoga: d17d2cc8105eed528474683b42e2ea310e1daf61
 
 PODFILE CHECKSUM: a259ed3643852a21906501baf0ae439b4935bd7c
