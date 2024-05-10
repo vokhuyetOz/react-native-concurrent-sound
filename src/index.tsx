@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules, Platform, NativeEventEmitter } from 'react-native';
 
 const LINKING_ERROR =
   `The package 'react-native-concurrent-sound' doesn't seem to be linked. Make sure: \n\n` +
@@ -32,19 +32,60 @@ export type TInput = {
 export type TInputSeek = TInput & {
   to: number;
 };
+export type TInputLoop = TInput & {
+  to: boolean;
+};
+export type TInputCategory = {
+  //ios: 'soloAmbient' | 'ambient' | 'playback';
+  to: 'soloAmbient' | 'ambient' | 'playback';
+};
 
-export function play({ uri, key }: TInput): Promise<void> {
-  return ConcurrentSound.play(key ?? uri, uri);
+export type TInputLoad = TInput & {
+  volume?: number;
+  loop?: boolean;
+};
+
+export const ConcurrentSoundEvent = new NativeEventEmitter(
+  Platform.select({
+    android: ConcurrentSoundModule,
+    ios: NativeModules.ConcurrentSoundEmitter,
+  })
+);
+
+export function load({
+  uri,
+  key = uri,
+  volume = 1,
+  loop = false,
+}: TInputLoad): Promise<number> {
+  return ConcurrentSound.load(key, uri, volume, loop);
 }
 
-export function pause({ uri, key }: TInput): Promise<void> {
-  return ConcurrentSound.pause(key ?? uri, uri);
+export function play({ uri, key = uri }: TInput): Promise<number> {
+  return ConcurrentSound.play(key, uri);
 }
 
-export function seek({ uri, key, to }: TInputSeek): Promise<boolean> {
-  return ConcurrentSound.seek(key ?? uri, uri, to);
+export function pause({ uri, key = uri }: TInput): Promise<void> {
+  return ConcurrentSound.pause(key, uri);
 }
 
-export function setVolume({ uri, key, to }: TInputSeek): Promise<void> {
-  return ConcurrentSound.setVolume(key ?? uri, uri, to);
+export function seek({ uri, key = uri, to }: TInputSeek): Promise<boolean> {
+  return ConcurrentSound.seek(key, uri, to);
+}
+
+export function setVolume({ uri, key = uri, to }: TInputSeek): Promise<void> {
+  return ConcurrentSound.setVolume(key, uri, to);
+}
+export function setLoop({ uri, key = uri, to }: TInputSeek): Promise<void> {
+  return ConcurrentSound.setLoop(key, uri, to);
+}
+export function setCategory({ to }: TInputCategory): Promise<void> | undefined {
+  if (Platform.OS !== 'ios') {
+    return;
+  }
+  return ConcurrentSound.setCategory(to);
+}
+
+export function stopAll(): Promise<boolean> {
+  return ConcurrentSound.stopAll();
 }
