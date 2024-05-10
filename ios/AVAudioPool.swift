@@ -14,30 +14,31 @@ import AVKit
 private var players =  [String: AVPlayer]()
 
 class AVPlayerPool: NSObject {
-
+    
     // Given the URL of a sound file, either create or reuse an audio player
     @objc
-    static func playerWithUri(key: String, uri: String) -> AVPlayer? {
+    static func playerWithUri(key: String) -> AVPlayer {
         // Try to find a player that can be reused and is not playing
         
         let playerToUse = players[key]
-
+        
         // If we found one, return it
         if (playerToUse != nil){
-            return playerToUse
+            return playerToUse!
         }
-        
-        var url: URL?
-        if(uri.starts(with: "http") || uri.starts(with: "file://")) {
-            url = URL(string: uri)
+        let newPlayer = AVPlayer()
+        players[key] = newPlayer
+        return newPlayer
+    }
+    @objc
+    static func stopAll(){
+        players.forEach { item in
+            item.value.pause()
+            NotificationCenter.default.removeObserver(
+            self,
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: item.value.currentItem)
         }
-        if(url != nil) {
-            let playerItem = AVPlayerItem(url: url!)
-            // Didn't find one? Create a new one
-            let newPlayer = AVPlayer(playerItem: playerItem)
-            players[key] = newPlayer
-            return newPlayer
-        }
-        return nil
+        players = [String: AVPlayer]()
     }
 }
