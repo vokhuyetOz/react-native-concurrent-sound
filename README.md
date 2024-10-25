@@ -1,3 +1,6 @@
+# You see it helpful
+- Give it a star
+- [Buy me a coffee](https://buymeacoffee.com/vokhuyetoz)
 # react-native-concurrent-sound
 
 play concurrent sound at same time
