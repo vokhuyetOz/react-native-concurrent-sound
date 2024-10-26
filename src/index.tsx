@@ -76,7 +76,16 @@ export function seek({ uri, key = uri, to }: TInputSeek): Promise<boolean> {
 export function setVolume({ uri, key = uri, to }: TInputSeek): Promise<void> {
   return ConcurrentSound.setVolume(key, uri, to);
 }
-export function setLoop({ uri, key = uri, to }: TInputSeek): Promise<void> {
+
+export function setPlaybackRate({
+  uri,
+  key = uri,
+  to,
+}: TInputSeek): Promise<void> {
+  return ConcurrentSound.setPlaybackRate(key, uri, to);
+}
+
+export function setLoop({ uri, key = uri, to }: TInputLoop): Promise<void> {
   return ConcurrentSound.setLoop(key, uri, to);
 }
 export function setCategory({ to }: TInputCategory): Promise<void> | undefined {

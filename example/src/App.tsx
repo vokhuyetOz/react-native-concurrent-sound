@@ -8,6 +8,7 @@ import {
   setVolume,
   load,
   stopAll,
+  setPlaybackRate,
   ConcurrentSoundEvent,
 } from '@vokhuyet/react-native-concurrent-sound';
 import DocumentPicker from 'react-native-document-picker';
@@ -53,6 +54,18 @@ export default function App() {
         }}
       >
         set volume actor 2 to 1
+      </Text>
+
+      <Text
+        onPress={() => {
+          setPlaybackRate({
+            uri: 'https://listenaminute.com/a/actors.mp3',
+            key: '2',
+            to: 2,
+          });
+        }}
+      >
+        set playback speed actor 2 to 2x
       </Text>
       <Text
         onPress={() => {

@@ -1,7 +1,10 @@
 package com.concurrentsound
 
 import android.media.AudioAttributes
+import android.media.PlaybackParams
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
@@ -110,6 +113,14 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
     val activeKey = getActiveKey(key, uri)
     val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
     playerToUse.setVolume(to, to)
+  }
+
+  @RequiresApi(Build.VERSION_CODES.M)
+  @ReactMethod
+  fun setPlaybackRate(key: String?, uri: String?, to: Float, promise: Promise) {
+    val activeKey = getActiveKey(key, uri)
+    val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
+    playerToUse.playbackParams = PlaybackParams().setSpeed(to)
   }
 
   @ReactMethod
