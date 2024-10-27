@@ -103,6 +103,15 @@ class ConcurrentSound: NSObject {
         
         player.volume = to
     }
+
+    @objc(setPlaybackRate:uri:to:withResolver:withRejecter:)
+    func setPlaybackRate(key: String?, uri: String?, to: Float, resolve: @escaping RCTPromiseResolveBlock, reject:RCTPromiseRejectBlock) -> Void {
+        let activeKey = getActiveKey(key: key, uri: uri)
+        let player = AVPlayerPool.playerWithUri(key: activeKey)
+        
+        player.rate = to
+    }
+
     @objc(setLoop:uri:to:withResolver:withRejecter:)
     func setLoop(key: String?, uri: String?, to: Bool, resolve: @escaping RCTPromiseResolveBlock, reject:RCTPromiseRejectBlock) -> Void {
         let activeKey = getActiveKey(key: key, uri: uri)

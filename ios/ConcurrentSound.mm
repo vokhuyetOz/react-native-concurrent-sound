@@ -35,6 +35,10 @@ RCT_EXTERN_METHOD(setVolume:(NSString)key uri:(NSString)uri to:(float) to
                   withResolver:(RCTPromiseResolveBlock) resolve
                   withRejecter:(RCTPromiseRejectBlock) reject)
 
+RCT_EXTERN_METHOD(setPlaybackRate:(NSString)key uri:(NSString)uri to:(float) to
+                  withResolver:(RCTPromiseResolveBlock) resolve
+                  withRejecter:(RCTPromiseRejectBlock) reject)
+
 RCT_EXTERN_METHOD(setLoop:(NSString)key uri:(NSString)uri to:(BOOL) to
                   withResolver:(RCTPromiseResolveBlock) resolve
                   withRejecter:(RCTPromiseRejectBlock) reject)
