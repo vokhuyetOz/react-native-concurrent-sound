@@ -1,6 +1,7 @@
 package com.concurrentsound
 
 import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.media.PlaybackParams
 import android.net.Uri
 import android.os.Build
@@ -53,27 +54,92 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
   @ReactMethod
   override fun load(key: String?, uri: String, volume: Float, loop: Boolean, promise: Promise) {
     val activeKey = getActiveKey(key, uri)
-    latestActiveKey = activeKey
-    val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
-    if(loadSoundStatus[activeKey] == true){
-      promise.resolve(playerToUse.duration)
-      return
-    }
-    playerToUse.setVolume(volume, volume)
-    playerToUse.isLooping = loop
-    loadSoundStatus[activeKey] = true
-    if (uri.startsWith("http") || uri.startsWith("file://")) {
-      val myUri = Uri.parse(uri)
-      playerToUse.setDataSource(this.reactApplicationContext, myUri)
-    }
-    playerToUse.setOnPreparedListener {
-      if (it.duration == -1) {
-        promise.resolve(-1)
-      } else {
-        promise.resolve(it.duration)
+    try {
+      latestActiveKey = activeKey
+
+      // Get or create player
+      val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
+
+      // If already loaded, just update properties and return
+      if (loadSoundStatus[activeKey] == true) {
+        try {
+          playerToUse.setVolume(volume, volume)
+          playerToUse.isLooping = loop
+          promise.resolve(playerToUse.duration)
+          return
+        } catch (e: Exception) {
+          // If there's an error with the existing player, continue to reload
+          loadSoundStatus[activeKey] = false
+        }
       }
+
+      // Reset and clear any previous state
+      try {
+        playerToUse.reset()
+      } catch (e: Exception) {
+        // Ignore reset errors
+      }
+
+      // Configure player
+      playerToUse.setVolume(volume, volume)
+      playerToUse.isLooping = loop
+
+      // Set error listener before setting data source
+      playerToUse.setOnErrorListener { mp, what, extra ->
+        loadSoundStatus[activeKey] = false
+        val errorMessage = when (what) {
+          MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK ->
+            "Media Error: Not valid for progressive playback ($what, $extra)"
+          MediaPlayer.MEDIA_ERROR_SERVER_DIED ->
+            "Media Error: Server died ($what, $extra)"
+          MediaPlayer.MEDIA_ERROR_UNKNOWN ->
+            "Media Error: Unknown ($what, $extra)"
+          else -> "Media Error: ($what, $extra)"
+        }
+        promise.reject("MEDIA_ERROR", errorMessage)
+        true
+      }
+
+      // Set prepared listener
+      playerToUse.setOnPreparedListener { mp ->
+        loadSoundStatus[activeKey] = true
+        if (mp.duration == -1) {
+          promise.resolve(-1)
+        } else {
+          promise.resolve(mp.duration)
+        }
+      }
+
+      // Handle different URI types
+      when {
+        uri.startsWith("http") || uri.startsWith("https") || uri.startsWith("file://") -> {
+          val myUri = Uri.parse(uri)
+          playerToUse.setDataSource(reactApplicationContext, myUri)
+        }
+        uri.startsWith("/") -> {
+          // Handle absolute file paths
+          playerToUse.setDataSource(uri)
+        }
+        else -> {
+          // Handle relative paths or other formats
+          val assetManager = reactApplicationContext.assets
+          val fileDescriptor = assetManager.openFd(uri)
+          playerToUse.setDataSource(
+            fileDescriptor.fileDescriptor,
+            fileDescriptor.startOffset,
+            fileDescriptor.length
+          )
+          fileDescriptor.close()
+        }
+      }
+
+      // Start async preparation
+      playerToUse.prepareAsync()
+
+    } catch (e: Exception) {
+      loadSoundStatus[activeKey] = false
+      promise.reject("LOAD_ERROR", "Error loading sound: ${e.message}")
     }
-    playerToUse.prepareAsync()
   }
 
   @ReactMethod
@@ -115,13 +181,22 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
     playerToUse.setVolume(to, to)
   }
 
-  @RequiresApi(Build.VERSION_CODES.M)
   @ReactMethod
   fun setPlaybackRate(key: String?, uri: String?, to: Float, promise: Promise) {
-    val activeKey = getActiveKey(key, uri)
-    val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
-    playerToUse.playbackParams = PlaybackParams().setSpeed(to)
+    try {
+      val activeKey = getActiveKey(key, uri)
+      val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
+        // Create new PlaybackParams
+        val params = PlaybackParams()
+        params.speed = to
+        // Assign the new params to the player
+        playerToUse.playbackParams = params
+        promise.resolve(true)
+    } catch (e: Exception) {
+      promise.reject("PLAYBACK_SPEED_ERROR", "Error setting playback rate: ${e.message}")
+    }
   }
+
 
   @ReactMethod
   override fun setLoop(key: String?, uri: String?, to: Boolean, promise: Promise) {
