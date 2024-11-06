@@ -31,6 +31,23 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text
+        style={styles.button}
+        onPress={async () => {
+          const duration = await load({
+            key: 'local',
+            uri: require('./local.mp3'),
+            loop: true,
+            volume: 1,
+          });
+          console.log('pick', duration);
+          play({ key: 'local', uri: require('./local.mp3') });
+        }}
+      >
+        Load and Play local assets
+      </Text>
+
+      <Text
+        style={styles.button}
         onPress={async () => {
           const select = await DocumentPicker.pickSingle();
           const duration = await load({
@@ -45,6 +62,7 @@ export default function App() {
         Pick
       </Text>
       <Text
+        style={styles.button}
         onPress={() => {
           setVolume({
             uri: 'https://listenaminute.com/a/actors.mp3',
@@ -57,6 +75,7 @@ export default function App() {
       </Text>
 
       <Text
+        style={styles.button}
         onPress={() => {
           setPlaybackRate({
             uri: 'https://listenaminute.com/a/actors.mp3',
@@ -68,6 +87,7 @@ export default function App() {
         set playback speed actor 2 to 2x
       </Text>
       <Text
+        style={styles.button}
         onPress={() => {
           setVolume({
             uri: 'https://listenaminute.com/a/actors.mp3',
@@ -79,6 +99,7 @@ export default function App() {
         set volume actor 2 to 0.3
       </Text>
       <Text
+        style={styles.button}
         onPress={async () => {
           const duration = await play({
             uri: 'https://listenaminute.com/a/actors.mp3',
@@ -90,6 +111,7 @@ export default function App() {
         Play actors 2
       </Text>
       <Text
+        style={styles.button}
         onPress={async () => {
           const duration = await load({
             uri: 'https://listenaminute.com/a/actors.mp3',
@@ -101,6 +123,7 @@ export default function App() {
         Load actors 2
       </Text>
       <Text
+        style={styles.button}
         onPress={() => {
           play({ uri: 'https://listenaminute.com/a/actors.mp3', key: '1' });
         }}
@@ -108,6 +131,7 @@ export default function App() {
         play actors 1
       </Text>
       <Text
+        style={styles.button}
         onPress={async () => {
           const duration = await load({
             uri: 'https://listenaminute.com/a/actors.mp3',
@@ -126,6 +150,7 @@ export default function App() {
         Load accidents
       </Text>
       <Text
+        style={styles.button}
         onPress={() => {
           play({ uri: 'https://listenaminute.com/a/accidents.mp3' });
         }}
@@ -133,6 +158,7 @@ export default function App() {
         Play accidents
       </Text>
       <Text
+        style={styles.button}
         onPress={() => {
           pause({ uri: 'https://listenaminute.com/a/actors.mp3' });
         }}
@@ -140,6 +166,7 @@ export default function App() {
         pause actors 1
       </Text>
       <Text
+        style={styles.button}
         onPress={() => {
           seek({ uri: 'https://listenaminute.com/a/actors.mp3', to: 0 });
         }}
@@ -147,6 +174,7 @@ export default function App() {
         seek
       </Text>
       <Text
+        style={styles.button}
         onPress={() => {
           stopAll();
         }}
@@ -163,9 +191,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+  button: {
+    padding: 10,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    marginBottom: 8,
   },
 });
