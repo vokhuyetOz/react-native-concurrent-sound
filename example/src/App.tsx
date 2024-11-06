@@ -10,6 +10,7 @@ import {
   stopAll,
   setPlaybackRate,
   ConcurrentSoundEvent,
+  //@ts-ignore
 } from '@vokhuyet/react-native-concurrent-sound';
 import DocumentPicker from 'react-native-document-picker';
 
@@ -17,7 +18,7 @@ export default function App() {
   useEffect(() => {
     const eventListener = ConcurrentSoundEvent.addListener(
       'OnSoundEnd',
-      (event) => {
+      (event: any) => {
         console.log('OnSoundEnd', event);
       }
     );
@@ -39,7 +40,7 @@ export default function App() {
             loop: true,
             volume: 1,
           });
-          console.log('pick', duration);
+          console.log('Load and Play local assets', duration);
           play({ key: 'local', uri: require('./local.mp3') });
         }}
       >
@@ -50,6 +51,7 @@ export default function App() {
         style={styles.button}
         onPress={async () => {
           const select = await DocumentPicker.pickSingle();
+          console.log('select', select);
           const duration = await load({
             uri: select.uri,
             loop: true,
