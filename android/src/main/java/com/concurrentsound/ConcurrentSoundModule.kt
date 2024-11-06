@@ -1,5 +1,6 @@
 package com.concurrentsound
 
+import android.content.ContentResolver
 import android.media.AudioAttributes
 import android.media.PlaybackParams
 import android.net.Uri
@@ -12,6 +13,7 @@ import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
 
 private fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
   reactContext
@@ -51,7 +53,7 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
   // See https://reactnative.dev/docs/native-modules-android
 
   @ReactMethod
-  override fun load(key: String?, uri: String, volume: Float, loop: Boolean, promise: Promise) {
+  override fun load(key: String?, uri: String, volume: Float, loop: Boolean, type: String?, promise: Promise) {
     val activeKey = getActiveKey(key, uri)
     latestActiveKey = activeKey
     val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
@@ -62,7 +64,17 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
     playerToUse.setVolume(volume, volume)
     playerToUse.isLooping = loop
     loadSoundStatus[activeKey] = true
-    if (uri.startsWith("http") || uri.startsWith("file://")) {
+
+    if (type === "asset") {
+      val resId = ResourceDrawableIdHelper.getInstance().getResourceDrawableId(this.reactApplicationContext, uri)
+      val url = Uri.Builder().scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+        .authority(this.reactApplicationContext.resources.getResourcePackageName(resId))
+        .appendPath(this.reactApplicationContext.resources.getResourceTypeName(resId))
+        .appendPath(this.reactApplicationContext.resources.getResourceEntryName(resId)).build()
+      playerToUse.setDataSource(this.reactApplicationContext, url)
+    }
+
+    if (uri.startsWith("http") || uri.startsWith("file://")|| uri.startsWith("content://")) {
       val myUri = Uri.parse(uri)
       playerToUse.setDataSource(this.reactApplicationContext, myUri)
     }
@@ -117,7 +129,7 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
 
   @RequiresApi(Build.VERSION_CODES.M)
   @ReactMethod
-  fun setPlaybackRate(key: String?, uri: String?, to: Float, promise: Promise) {
+  override fun setPlaybackRate(key: String?, uri: String?, to: Float, promise: Promise) {
     val activeKey = getActiveKey(key, uri)
     val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
     playerToUse.playbackParams = PlaybackParams().setSpeed(to)

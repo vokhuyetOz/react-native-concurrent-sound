@@ -7,7 +7,13 @@
 
 play concurrent sound at same time
 
-compatible with both old and new architecture(not tested)
+[x] compatible with both old
+
+[x] new architecture(not tested)
+
+[x] support https://, http://, file://
+
+[x] require(asset)
 
 IOS use [AVPlayer](https://developer.apple.com/documentation/avfoundation/avplayer/) under the hood
 
@@ -36,6 +42,7 @@ import {
 
 // ...
 load({ uri: 'https://example.file.mp3', key: '1', volume: 1, loop: false });
+load({ uri: require('./file.mp3'), key: 'local', volume: 1, loop: false }); //should add key for local assets
 pause({ uri: 'https://example.file.mp3', key: '2' });
 play({ uri: 'https://example.file.mp3', key: '1' });
 pause({ uri: 'https://example.file.mp3', key: '2' });
@@ -75,7 +82,7 @@ function must be call before play
 
 | Property |    Type    |         Default          | Description                                                                                                                            |
 | -------- | :--------: | :----------------------: | -------------------------------------------------------------------------------------------------------------------------------------- |
-| **uri**  | **string** |                          | **must provide http or file:// to load sound**                                                                                         |
+| **uri**  | **string, require(assets)** |                          | **must provide http or file:// or require(asset) to load sound**                                                                                         |
 | key      |   string   | uri -> latest active uri | key is used to get player that playing uri, will use uri if not exist, key is useful in case of creating multiple player of same sound |
 | volume   |   number   |            1             | volume of Sound 0 -> 1                                                                                                                 |
 | loop     |  boolean   |          false           | true/false                                                                                                                             |
@@ -90,7 +97,7 @@ create new player to play sound if it is not exist, return duration of Sound
 
 | Property |    Type    |         Default          | Description                                                                                                                            |
 | -------- | :--------: | :----------------------: | -------------------------------------------------------------------------------------------------------------------------------------- |
-| **uri**  | **string** |                          | **must provide http or file:// to play sound**                                                                                         |
+| **uri**  | **string, require(assets)** |                          | **must provide http or file:// or require(asset) to play sound**                                                                                         |
 | key      |   string   | uri -> latest active uri | key is used to get player that playing uri, will use uri if not exist, key is useful in case of creating multiple player of same sound |
 
 <br/>
@@ -104,7 +111,7 @@ pause active player
 | Property |  Type  |         Default          | Description                                                                                               |
 | -------- | :----: | :----------------------: | --------------------------------------------------------------------------------------------------------- |
 | key      | string | uri -> latest active uri | key is used to get player that playing uri                                                                |
-| uri      | string |                          | uri is used to get player that playing uri, if key is not provided. Otherwise, will use latest active uri |
+| **uri**  | **string, require(assets)** |                           | uri is used to get player that playing uri, if key is not provided. Otherwise, will use latest active uri |
 
 <br/>
 
@@ -117,7 +124,7 @@ seek to time (seconds)
 | Property |    Type    |         Default          | Description                                                                                                                              |
 | -------- | :--------: | :----------------------: | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | key      |   string   | uri -> latest active uri | key is used to get player that playing uri, will be create if not exist, key is useful in case of creating multiple player of same sound |
-| uri      |   string   |                          | uri is used to get player that playing uri, if key is not provided otherwise, will use latest active uri                                 |
+| **uri**  | **string, require(assets)** |                           | uri is used to get player that playing uri, if key is not provided otherwise, will use latest active uri                                 |
 | **to**   | **number** |        undefined         | **time in second to seek**                                                                                                               |
 
 <br/>
@@ -131,7 +138,7 @@ set volume of one player (0->1)
 | Property |    Type    |         Default          | Description                                                                                                                              |
 | -------- | :--------: | :----------------------: | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | key      |   string   | uri -> latest active uri | key is used to get player that playing uri, will be create if not exist, key is useful in case of creating multiple player of same sound |
-| uri      |   string   |                          | uri is used to get player that playing uri, if key is not provided otherwise, will use latest active uri                                 |
+| **uri**  | **string, require(assets)** |                           | uri is used to get player that playing uri, if key is not provided otherwise, will use latest active uri                                 |
 | **to**   | **number** |        undefined         | **0.0 -> 1.0**                                                                                                                           |
 
 <br />
@@ -145,7 +152,7 @@ set playback speed of one player
 | Property |    Type    |         Default          | Description                                                                                                                              |
 | -------- | :--------: | :----------------------: | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | key      |   string   | uri -> latest active uri | key is used to get player that playing uri, will be create if not exist, key is useful in case of creating multiple player of same sound |
-| uri      |   string   |                          | uri is used to get player that playing uri, if key is not provided otherwise, will use latest active uri                                 |
+| **uri**  | **string, require(assets)** |                           | uri is used to get player that playing uri, if key is not provided otherwise, will use latest active uri                                 |
 | **to**   | **number** |            1             | playback speed of the audio, 2 will play the audio at 2x                                                                                 |
 
 <br />
