@@ -1,16 +1,16 @@
 package com.concurrentsound
 
 import android.content.ContentResolver
-import android.media.AudioAttributes
 import android.media.PlaybackParams
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContext
+import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
@@ -64,20 +64,21 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
     playerToUse.setVolume(volume, volume)
     playerToUse.isLooping = loop
     loadSoundStatus[activeKey] = true
-
-    if (type === "asset") {
-      val resId = ResourceDrawableIdHelper.getInstance().getResourceDrawableId(this.reactApplicationContext, uri)
-      val url = Uri.Builder().scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-        .authority(this.reactApplicationContext.resources.getResourcePackageName(resId))
-        .appendPath(this.reactApplicationContext.resources.getResourceTypeName(resId))
-        .appendPath(this.reactApplicationContext.resources.getResourceEntryName(resId)).build()
-      playerToUse.setDataSource(this.reactApplicationContext, url)
-    }
-
     if (uri.startsWith("http") || uri.startsWith("file://")|| uri.startsWith("content://")) {
       val myUri = Uri.parse(uri)
       playerToUse.setDataSource(this.reactApplicationContext, myUri)
+    } else if (type == "asset") {
+      val resourceId: Int =
+        this.reactApplicationContext.resources.getIdentifier(uri, "raw", this.reactApplicationContext.packageName)
+
+      val url = Uri.Builder().scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+        .authority(this.reactApplicationContext.resources.getResourcePackageName(resourceId))
+        .appendPath(this.reactApplicationContext.resources.getResourceTypeName(resourceId))
+        .appendPath(this.reactApplicationContext.resources.getResourceEntryName(resourceId)).build()
+      playerToUse.setDataSource(this.reactApplicationContext, url)
     }
+
+
     playerToUse.setOnPreparedListener {
       if (it.duration == -1) {
         promise.resolve(-1)
