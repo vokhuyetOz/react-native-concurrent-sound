@@ -14,9 +14,7 @@ export interface Spec extends TurboModule {
   setVolume(key: string, uri: string, to: number): Promise<void>;
   setPlaybackRate(key: string, uri: string, to: number): Promise<void>;
   setLoop(key: string, uri: string, to: boolean): Promise<void>;
-  setCategory(
-    to: 'soloAmbient' | 'ambient' | 'playback'
-  ): Promise<void> | undefined;
+  setCategory(to: string): Promise<void>;
   stopAll(): Promise<boolean>;
 }
 
