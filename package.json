@@ -1,6 +1,6 @@
 {
   "name": "@vokhuyet/react-native-concurrent-sound",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "play concurrent sound",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

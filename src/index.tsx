@@ -18,16 +18,16 @@ const ConcurrentSoundModule = isTurboModuleEnabled
   ? require('./NativeConcurrentSound').default
   : NativeModules.ConcurrentSound;
 
-const ConcurrentSound = ConcurrentSoundModule
-  ? ConcurrentSoundModule
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
+const ConcurrentSound =
+  ConcurrentSoundModule ||
+  new Proxy(
+    {},
+    {
+      get() {
+        throw new Error(LINKING_ERROR);
+      },
+    }
+  );
 
 export type TInput = {
   uri?: string;
@@ -57,9 +57,11 @@ export const ConcurrentSoundEvent = new NativeEventEmitter(
   })
 );
 
-function getAsset(uri?: string) {
+function getAsset(uri?: string | number) {
+  console.log('getAsset', uri);
   if (typeof uri === 'number') {
     const asset = Image.resolveAssetSource(uri).uri;
+    console.log('asset', uri);
     return {
       asset,
       type: 'asset',
@@ -77,7 +79,7 @@ export function load({
   if (Platform.OS === 'android') {
     return ConcurrentSound.load(key, asset, volume, loop, type);
   }
-  return ConcurrentSound.load(key, asset, volume, loop);
+  return ConcurrentSound.load(key, uri, volume, loop);
 }
 
 export function play({ uri, key = uri }: TInput): Promise<number> {
