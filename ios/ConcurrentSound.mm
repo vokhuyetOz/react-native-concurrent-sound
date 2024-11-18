@@ -19,27 +19,27 @@ RCT_EXTERN_METHOD(load:(NSString)key uri: (NSString)uri volume: (float)volume lo
                   withResolver:(RCTPromiseResolveBlock) resolve
                   withRejecter:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(play:(NSString)key uri: (NSString)uri
+RCT_EXTERN_METHOD(play:(NSString)key
                   withResolver:(RCTPromiseResolveBlock) resolve
                   withRejecter:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(pause:(NSString)key uri:(NSString)uri
+RCT_EXTERN_METHOD(pause:(NSString)key
                   withResolver:(RCTPromiseResolveBlock) resolve
                   withRejecter:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(seek:(NSString)key uri:(NSString)uri to:(double) to
+RCT_EXTERN_METHOD(seek:(NSString)key to:(double) to
                   withResolver:(RCTPromiseResolveBlock) resolve
                   withRejecter:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(setVolume:(NSString)key uri:(NSString)uri to:(float) to
+RCT_EXTERN_METHOD(setVolume:(NSString)key to:(float) to
                   withResolver:(RCTPromiseResolveBlock) resolve
                   withRejecter:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(setPlaybackRate:(NSString)key uri:(NSString)uri to:(float) to
+RCT_EXTERN_METHOD(setPlaybackRate:(NSString)key to:(float) to
                   withResolver:(RCTPromiseResolveBlock) resolve
                   withRejecter:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(setLoop:(NSString)key uri:(NSString)uri to:(BOOL) to
+RCT_EXTERN_METHOD(setLoop:(NSString)key to:(BOOL) to
                   withResolver:(RCTPromiseResolveBlock) resolve
                   withRejecter:(RCTPromiseRejectBlock) reject)
 
@@ -53,7 +53,7 @@ RCT_EXTERN_METHOD(stopAll:(RCTPromiseResolveBlock) resolve
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
 (const facebook::react::ObjCTurboModule::InitParams &)params
 {
-    return std::make_shared<facebook::react::NativeConcurrentSoundSpecJSI>(params);
+  return std::make_shared<facebook::react::NativeConcurrentSoundSpecJSI>(params);
 }
 #endif
 

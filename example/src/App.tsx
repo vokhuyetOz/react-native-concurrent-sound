@@ -41,7 +41,7 @@ export default function App() {
             volume: 1,
           });
           console.log('Load and Play local assets', duration);
-          play({ key: 'local', uri: require('./local.mp3') });
+          play({ key: 'local' });
         }}
       >
         Load and Play local assets
@@ -53,12 +53,13 @@ export default function App() {
           const select = await DocumentPicker.pickSingle();
           console.log('select', select);
           const duration = await load({
+            key: select.uri,
             uri: select.uri,
             loop: true,
             volume: 1,
           });
           console.log('pick', duration);
-          play({ uri: select.uri });
+          play({ key: select.uri });
         }}
       >
         Pick
@@ -67,7 +68,6 @@ export default function App() {
         style={styles.button}
         onPress={() => {
           setVolume({
-            uri: 'https://listenaminute.com/a/actors.mp3',
             key: '2',
             to: 1,
           });
@@ -80,7 +80,6 @@ export default function App() {
         style={styles.button}
         onPress={() => {
           setPlaybackRate({
-            uri: 'https://listenaminute.com/a/actors.mp3',
             key: '2',
             to: 2,
           });
@@ -92,7 +91,6 @@ export default function App() {
         style={styles.button}
         onPress={() => {
           setVolume({
-            uri: 'https://listenaminute.com/a/actors.mp3',
             key: '2',
             to: 0.3,
           });
@@ -104,7 +102,6 @@ export default function App() {
         style={styles.button}
         onPress={async () => {
           const duration = await play({
-            uri: 'https://listenaminute.com/a/actors.mp3',
             key: '2',
           });
           console.log('duration', duration);
@@ -116,8 +113,8 @@ export default function App() {
         style={styles.button}
         onPress={async () => {
           const duration = await load({
-            uri: 'https://listenaminute.com/a/actors.mp3',
             key: '2',
+            uri: 'https://listenaminute.com/a/actors.mp3',
           });
           console.log('duration', duration);
         }}
@@ -127,7 +124,23 @@ export default function App() {
       <Text
         style={styles.button}
         onPress={() => {
-          play({ uri: 'https://listenaminute.com/a/actors.mp3', key: '1' });
+          pause({ key: '1' });
+        }}
+      >
+        pause actors 1
+      </Text>
+      <Text
+        style={styles.button}
+        onPress={() => {
+          seek({ key: '1', to: 0 });
+        }}
+      >
+        seek actors 1 to 0
+      </Text>
+      <Text
+        style={styles.button}
+        onPress={() => {
+          play({ key: '1' });
         }}
       >
         play actors 1
@@ -145,8 +158,12 @@ export default function App() {
         load actors 1
       </Text>
       <Text
+        style={styles.button}
         onPress={() => {
-          load({ uri: 'https://listenaminute.com/a/accidents.mp3' });
+          load({
+            uri: 'https://listenaminute.com/a/accidents.mp3',
+            key: 'https://listenaminute.com/a/accidents.mp3',
+          });
         }}
       >
         Load accidents
@@ -154,27 +171,12 @@ export default function App() {
       <Text
         style={styles.button}
         onPress={() => {
-          play({ uri: 'https://listenaminute.com/a/accidents.mp3' });
+          play({ key: 'https://listenaminute.com/a/accidents.mp3' });
         }}
       >
         Play accidents
       </Text>
-      <Text
-        style={styles.button}
-        onPress={() => {
-          pause({ uri: 'https://listenaminute.com/a/actors.mp3' });
-        }}
-      >
-        pause actors 1
-      </Text>
-      <Text
-        style={styles.button}
-        onPress={() => {
-          seek({ uri: 'https://listenaminute.com/a/actors.mp3', to: 0 });
-        }}
-      >
-        seek
-      </Text>
+
       <Text
         style={styles.button}
         onPress={() => {

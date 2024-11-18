@@ -8,12 +8,12 @@ export interface Spec extends TurboModule {
     volume: number,
     loop: boolean
   ): Promise<number>;
-  play(key: string, uri: string): Promise<number>;
-  pause(key: string, uri: string): Promise<void>;
-  seek(key: string, uri: string, to: number): Promise<boolean>;
-  setVolume(key: string, uri: string, to: number): Promise<void>;
-  setPlaybackRate(key: string, uri: string, to: number): Promise<void>;
-  setLoop(key: string, uri: string, to: boolean): Promise<void>;
+  play(key: string): Promise<number>;
+  pause(key: string): Promise<void>;
+  seek(key: string, to: number): Promise<boolean>;
+  setVolume(key: string, to: number): Promise<void>;
+  setPlaybackRate(key: string, to: number): Promise<void>;
+  setLoop(key: string, to: boolean): Promise<void>;
   setCategory(to: string): Promise<void>;
   stopAll(): Promise<boolean>;
 }

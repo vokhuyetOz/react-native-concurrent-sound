@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.media.PlaybackParams
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
@@ -13,7 +12,6 @@ import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
 
 private fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
   reactContext
@@ -51,23 +49,27 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
 //    }
   }
   // See https://reactnative.dev/docs/native-modules-android
-
   @ReactMethod
-  override fun load(key: String?, uri: String, volume: Float, loop: Boolean, type: String?, promise: Promise) {
-    val activeKey = getActiveKey(key, uri)
-    latestActiveKey = activeKey
-    val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
-    if(loadSoundStatus[activeKey] == true){
+  override fun load(
+    key: String,
+    uri: String,
+    volume: Double,
+    loop: Boolean,
+    promise: Promise
+  ) {
+    latestActiveKey = key
+    val playerToUse = MediaPlayerPool.playerWithUri(key)
+    if(loadSoundStatus[key] == true){
       promise.resolve(playerToUse.duration)
       return
     }
-    playerToUse.setVolume(volume, volume)
+    playerToUse.setVolume(volume.toFloat(), volume.toFloat())
     playerToUse.isLooping = loop
-    loadSoundStatus[activeKey] = true
+    loadSoundStatus[key] = true
     if (uri.startsWith("http") || uri.startsWith("file://")|| uri.startsWith("content://")) {
       val myUri = Uri.parse(uri)
       playerToUse.setDataSource(this.reactApplicationContext, myUri)
-    } else if (type == "asset") {
+    } else {
       val resourceId: Int =
         this.reactApplicationContext.resources.getIdentifier(uri, "raw", this.reactApplicationContext.packageName)
 
@@ -91,16 +93,14 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
 
   @ReactMethod
   override fun play(
-    key: String?, uri: String, promise: Promise
+    key: String, promise: Promise
   ) {
-    val activeKey = getActiveKey(key, uri)
-    latestActiveKey = activeKey
-    val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
+    latestActiveKey = key
+    val playerToUse = MediaPlayerPool.playerWithUri(key)
     playerToUse.start()
     playerToUse.setOnCompletionListener {
       val params = Arguments.createMap().apply {
-        putString("key", activeKey)
-        putString("uri", uri)
+        putString("key", key)
       }
       sendEvent(this.reactApplicationContext, "OnSoundEnd", params)
     }
@@ -108,38 +108,33 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
   }
 
   @ReactMethod
-  override fun pause(key: String?, uri: String?, promise: Promise) {
-    val activeKey = getActiveKey(key, uri)
-    val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
+  override fun pause(key: String, promise: Promise) {
+    val playerToUse = MediaPlayerPool.playerWithUri(key)
     playerToUse.pause()
   }
 
   @ReactMethod
-  override fun seek(key: String?, uri: String?, to: Double, promise: Promise) {
-    val activeKey = getActiveKey(key, uri)
-    val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
+  override fun seek(key: String, to: Double, promise: Promise) {
+    val playerToUse = MediaPlayerPool.playerWithUri(key)
     playerToUse.seekTo((to * 1000).toInt())
   }
 
   @ReactMethod
-  override fun setVolume(key: String?, uri: String?, to: Float, promise: Promise) {
-    val activeKey = getActiveKey(key, uri)
-    val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
-    playerToUse.setVolume(to, to)
+  override fun setVolume(key: String, to: Double, promise: Promise) {
+    val playerToUse = MediaPlayerPool.playerWithUri(key)
+    playerToUse.setVolume(to.toFloat(), to.toFloat())
   }
 
   @RequiresApi(Build.VERSION_CODES.M)
   @ReactMethod
-  override fun setPlaybackRate(key: String?, uri: String?, to: Float, promise: Promise) {
-    val activeKey = getActiveKey(key, uri)
-    val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
-    playerToUse.playbackParams = PlaybackParams().setSpeed(to)
+  override fun setPlaybackRate(key: String, to: Double, promise: Promise) {
+    val playerToUse = MediaPlayerPool.playerWithUri(key)
+    playerToUse.playbackParams = PlaybackParams().setSpeed(to.toFloat())
   }
 
   @ReactMethod
-  override fun setLoop(key: String?, uri: String?, to: Boolean, promise: Promise) {
-    val activeKey = getActiveKey(key, uri)
-    val playerToUse = MediaPlayerPool.playerWithUri(activeKey)
+  override fun setLoop(key: String, to: Boolean, promise: Promise) {
+    val playerToUse = MediaPlayerPool.playerWithUri(key)
     playerToUse.isLooping = to
   }
   @ReactMethod
@@ -148,16 +143,11 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
     loadSoundStatus = HashMap()
     promise.resolve(true)
   }
-
-  private fun getActiveKey(key: String?, uri: String?): String {
-    if (key != null) {
-      return key
-    }
-    if (uri != null) {
-      return uri
-    }
-    return latestActiveKey!!
+  @ReactMethod
+  override fun setCategory(to: String, promise: Promise) {
+    TODO("Not yet implemented")
   }
+
 
   companion object {
     const val NAME = "ConcurrentSound"
