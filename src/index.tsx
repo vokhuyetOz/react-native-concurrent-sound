@@ -30,8 +30,7 @@ const ConcurrentSound =
   );
 
 export type TInput = {
-  uri?: string;
-  key?: string;
+  key: string;
 };
 
 export type TInputSeek = TInput & {
@@ -46,6 +45,7 @@ export type TInputCategory = {
 };
 
 export type TInputLoad = TInput & {
+  uri: string;
   volume?: number;
   loop?: boolean;
 };
@@ -58,10 +58,8 @@ export const ConcurrentSoundEvent = new NativeEventEmitter(
 );
 
 function getAsset(uri?: string | number) {
-  console.log('getAsset', uri);
   if (typeof uri === 'number') {
     const asset = Image.resolveAssetSource(uri).uri;
-    console.log('asset', uri);
     return {
       asset,
       type: 'asset',
@@ -69,50 +67,38 @@ function getAsset(uri?: string | number) {
   }
   return { asset: uri };
 }
-export function load({
-  uri,
-  key = uri,
-  volume = 1,
-  loop = false,
-}: TInputLoad): Promise<number> {
-  const { asset, type } = getAsset(uri);
-  if (Platform.OS === 'android') {
-    return ConcurrentSound.load(key, asset, volume, loop, type);
-  }
-  return ConcurrentSound.load(key, uri, volume, loop);
-}
-
-export function play({ uri, key = uri }: TInput): Promise<number> {
+export function load({ uri, key, volume, loop }: TInputLoad): Promise<number> {
   const { asset } = getAsset(uri);
-  return ConcurrentSound.play(key, asset);
+
+  return ConcurrentSound.load(key, asset, volume ?? 1, loop ?? false);
 }
 
-export function pause({ uri, key = uri }: TInput): Promise<void> {
-  const { asset } = getAsset(uri);
-  return ConcurrentSound.pause(key, asset);
+export function play({ key }: TInput): Promise<number> {
+  return ConcurrentSound.play(key);
 }
 
-export function seek({ uri, key = uri, to }: TInputSeek): Promise<boolean> {
-  const { asset } = getAsset(uri);
-  return ConcurrentSound.seek(key, asset, to);
+export function pause({ key }: TInput): Promise<void> {
+  return ConcurrentSound.pause(key);
 }
 
-export function setVolume({ uri, key = uri, to }: TInputSeek): Promise<void> {
-  const { asset } = getAsset(uri);
-  return ConcurrentSound.setVolume(key, asset, to);
+export function seek({ key, to }: TInputSeek): Promise<boolean> {
+  return ConcurrentSound.seek(key, to);
 }
 
-export function setPlaybackRate({
-  uri,
-  key = uri,
-  to,
-}: TInputSeek): Promise<void> {
-  return ConcurrentSound.setPlaybackRate(key, uri, to);
+export function setVolume({ key, to }: TInputSeek): Promise<void> {
+  return ConcurrentSound.setVolume(key, to);
 }
 
-export function setLoop({ uri, key = uri, to }: TInputLoop): Promise<void> {
-  return ConcurrentSound.setLoop(key, uri, to);
+export function setPlaybackRate({ key, to }: TInputSeek): Promise<void> {
+  return ConcurrentSound.setPlaybackRate(key, to);
 }
+
+export function setLoop({ key, to }: TInputLoop): Promise<void> {
+  return ConcurrentSound.setLoop(key, to);
+}
+/**
+ * ios only
+ */
 export function setCategory({ to }: TInputCategory): Promise<void> | undefined {
   if (Platform.OS !== 'ios') {
     return;
