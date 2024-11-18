@@ -40,7 +40,7 @@ import {
 
 // ...
 // key is required
-load({ , key: '1', volume: 1, loop: false });
+load({ uri:"https://example.com/file.mp3", key: '1', volume: 1, loop: false });
 load({ uri: require('./file.mp3'), key: 'local', volume: 1, loop: false }); 
 pause({ key: '2' });
 play({ key: '1' });
