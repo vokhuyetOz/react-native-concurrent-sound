@@ -89,7 +89,13 @@ class ConcurrentSound: NSObject {
     
     player.play()
     
-    resolve((player.currentItem?.asset.duration.seconds)!*1000) //miliseconds
+    // resolve((player.currentItem?.asset.duration.seconds)!*1000) //miliseconds
+    if let currentItem = player.currentItem {
+        let duration = currentItem.asset.duration.seconds
+        resolve(duration * 1000)  // Convert to milliseconds
+    } else {
+        reject("PLAYER_ERROR", "Current item is nil", nil)
+    }
   }
   
   @objc(pause:withResolver:withRejecter:)
