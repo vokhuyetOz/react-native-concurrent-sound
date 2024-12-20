@@ -63,32 +63,40 @@ class ConcurrentSoundModule internal constructor(context: ReactApplicationContex
       promise.resolve(playerToUse.duration)
       return
     }
-    playerToUse.setVolume(volume.toFloat(), volume.toFloat())
-    playerToUse.isLooping = loop
-    loadSoundStatus[key] = true
-    if (uri.startsWith("http") || uri.startsWith("file://")|| uri.startsWith("content://")) {
-      val myUri = Uri.parse(uri)
-      playerToUse.setDataSource(this.reactApplicationContext, myUri)
-    } else {
-      val resourceId: Int =
-        this.reactApplicationContext.resources.getIdentifier(uri, "raw", this.reactApplicationContext.packageName)
+    try {
+        playerToUse.setVolume(volume.toFloat(), volume.toFloat())
+        playerToUse.isLooping = loop
+        loadSoundStatus[key] = true
+        if (uri.startsWith("http") || uri.startsWith("file://")|| uri.startsWith("content://")) {
+            val myUri = Uri.parse(uri)
+            playerToUse.setDataSource(this.reactApplicationContext, myUri)
+        } else {
+            val resourceId: Int =
+             this.reactApplicationContext.resources.getIdentifier( uri, "raw", this.reactApplicationContext.packageName)
 
-      val url = Uri.Builder().scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-        .authority(this.reactApplicationContext.resources.getResourcePackageName(resourceId))
-        .appendPath(this.reactApplicationContext.resources.getResourceTypeName(resourceId))
-        .appendPath(this.reactApplicationContext.resources.getResourceEntryName(resourceId)).build()
-      playerToUse.setDataSource(this.reactApplicationContext, url)
+            val url = Uri.Builder().scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                .authority(this.reactApplicationContext.resources.getResourcePackageName(resourceId))
+                .appendPath(this.reactApplicationContext.resources.getResourceTypeName(resourceId))
+                .appendPath(this.reactApplicationContext.resources.getResourceEntryName(resourceId)).build()
+            playerToUse.setDataSource(this.reactApplicationContext, url)
+        }
+
+
+        playerToUse.setOnPreparedListener {
+            if (it.duration == -1) {
+                promise.resolve(-1)
+            } else {
+                promise.resolve(it.duration)
+            }
+        }
+        playerToUse.setOnErrorListener { _, what, extra ->
+            promise.reject("MediaPlayerError", "Error during preparation: What=$what, Extra=$extra")
+            return@setOnErrorListener true
+        }
+        playerToUse.prepareAsync()
+    } catch (e: Exception) {
+        promise.reject("LoadError", "Failed to load sound with URI: $uri", e)
     }
-
-
-    playerToUse.setOnPreparedListener {
-      if (it.duration == -1) {
-        promise.resolve(-1)
-      } else {
-        promise.resolve(it.duration)
-      }
-    }
-    playerToUse.prepareAsync()
   }
 
   @ReactMethod

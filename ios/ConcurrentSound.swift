@@ -30,7 +30,17 @@ class ConcurrentSound: NSObject {
     loopSound[key] = loop
     let player = AVPlayerPool.playerWithUri(key: key)
     if(loadSoundStatus[key] == true){
-      resolve((player.currentItem?.asset.duration.seconds)!*1000) //miliseconds
+      // resolve((player.currentItem?.asset.duration.seconds)!*1000) //miliseconds
+      if let currentItem = player.currentItem {
+        let duration = currentItem.asset.duration.seconds
+        if duration.isFinite {
+            resolve(duration * 1000) // Return duration in milliseconds
+        } else {
+            reject("DURATION_ERROR", "Invalid duration for loaded sound", nil)
+        }
+      } else {
+          reject("PLAYER_ERROR", "Current item is nil for already loaded sound", nil)
+      }
       return
     }
     loadSoundStatus[key] = true
@@ -47,7 +57,13 @@ class ConcurrentSound: NSObject {
     }
     player.volume = volume
     
-    resolve((player.currentItem?.asset.duration.seconds)!*1000) //miliseconds
+    // resolve((player.currentItem?.asset.duration.seconds)!*1000) //miliseconds
+    if let currentItem = player.currentItem {
+        let duration = currentItem.asset.duration.seconds
+        resolve(duration * 1000)  // Convert to milliseconds
+    } else {
+        reject("PLAYER_ERROR", "Current item is nil", nil)
+    }
   }
   
   @objc(play:withResolver:withRejecter:)
