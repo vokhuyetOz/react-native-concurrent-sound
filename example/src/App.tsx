@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, ScrollView, Text } from 'react-native';
 import {
   play,
   pause,
@@ -30,23 +30,29 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text
         style={styles.button}
         onPress={async () => {
           const duration = await load({
             key: 'local',
             uri: require('./local.mp3'),
-            loop: true,
+            loop: false,
             volume: 1,
           });
-          console.log('Load and Play local assets', duration);
+          console.log('Load local assets', duration);
+        }}
+      >
+        Load local assets
+      </Text>
+      <Text
+        style={styles.button}
+        onPress={async () => {
           play({ key: 'local' });
         }}
       >
-        Load and Play local assets
+        Play local assets
       </Text>
-
       <Text
         style={styles.button}
         onPress={async () => {
@@ -185,15 +191,13 @@ export default function App() {
       >
         stopAll
       </Text>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 20,
   },
   button: {
     padding: 10,

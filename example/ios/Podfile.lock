@@ -886,7 +886,7 @@ PODS:
   - React-Mapbuffer (0.73.6):
     - glog
     - React-debug
-  - react-native-concurrent-sound (0.0.14):
+  - react-native-concurrent-sound (0.1.0):
     - React-Core
   - react-native-document-picker (9.1.2):
     - React-Core
@@ -1254,7 +1254,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 85583ef014ce53d731a98c66a0e24496f7a83066
   React-logger: 3eb80a977f0d9669468ef641a5e1fabbc50a09ec
   React-Mapbuffer: 84ea43c6c6232049135b1550b8c60b2faac19fab
-  react-native-concurrent-sound: 83cd8dda0269e262601cb67b9f6f673a7126af00
+  react-native-concurrent-sound: e74b93a9355c7e0b1ea790709b2d60087ee33b15
   react-native-document-picker: 86bcfb8e2c94cd587ca9feb0049831b806df590d
   React-nativeconfig: b4d4e9901d4cabb57be63053fd2aa6086eb3c85f
   React-NativeModulesApple: cd26e56d56350e123da0c1e3e4c76cb58a05e1ee
