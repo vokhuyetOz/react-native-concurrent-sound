@@ -64,29 +64,27 @@ class ConcurrentSound: NSObject {
     } else {
         reject("PLAYER_ERROR", "Current item is nil", nil)
     }
+    NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: player.currentItem,
+                                           queue: .main, using: {notification in
+      ConcurrentSoundEmitter.emitter.sendEvent(withName: "OnSoundEnd", body: ["key": key])
+      let playerToUse = AVPlayerPool.playerWithUri(key: key)
+      if(playerToUse.currentItem == nil){
+        return
+      }
+      playerToUse.pause()
+      if(self.loopSound[key] == true){
+        playerToUse.currentItem?.seek(to: CMTime.zero, completionHandler: { _ in
+          playerToUse.play()
+        })
+        return
+      }
+      playerToUse.currentItem?.seek(to: CMTime.zero, completionHandler: nil)
+    })
   }
   
   @objc(play:withResolver:withRejecter:)
   func play(key: String, resolve:RCTPromiseResolveBlock, reject:RCTPromiseRejectBlock) -> Void {
-    
-    
     let player = AVPlayerPool.playerWithUri(key: key)
-    
-    NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: player.currentItem,
-                                           queue: .main, using: {notification in
-      ConcurrentSoundEmitter.emitter.sendEvent(withName: "OnSoundEnd", body: ["key": key])
-      if(self.loopSound[key] == true){
-        let playerToUse = AVPlayerPool.playerWithUri(key: key)
-        if(playerToUse.currentItem == nil){
-          return
-        }
-        playerToUse.pause()
-        playerToUse.currentItem?.seek(to: CMTime.zero, completionHandler: { _ in
-          playerToUse.play()
-        })
-      }
-    })
-    
     player.play()
     
     // resolve((player.currentItem?.asset.duration.seconds)!*1000) //miliseconds
