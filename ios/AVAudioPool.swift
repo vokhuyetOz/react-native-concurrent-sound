@@ -11,7 +11,7 @@ import AVKit
 
 // An array of all players stored in the pool; not accessible
 // outside this file
-private var players =  [String: AVPlayer]()
+private var players = [String: AVPlayer]()
 
 class AVPlayerPool: NSObject {
     
@@ -19,26 +19,24 @@ class AVPlayerPool: NSObject {
     @objc
     static func playerWithUri(key: String) -> AVPlayer {
         // Try to find a player that can be reused and is not playing
-        
-        let playerToUse = players[key]
-        
-        // If we found one, return it
-        if (playerToUse != nil){
-            return playerToUse!
+        if let playerToUse = players[key] {
+            return playerToUse
         }
         let newPlayer = AVPlayer()
         players[key] = newPlayer
         return newPlayer
     }
+    
     @objc
-    static func stopAll(){
+    static func stopAll() {
         players.forEach { item in
             item.value.pause()
             NotificationCenter.default.removeObserver(
-            self,
-            name: .AVPlayerItemDidPlayToEndTime,
-            object: item.value.currentItem)
+                self,
+                name: .AVPlayerItemDidPlayToEndTime,
+                object: item.value.currentItem
+            )
         }
-        players = [String: AVPlayer]()
+        players.removeAll()
     }
 }

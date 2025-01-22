@@ -16,13 +16,18 @@ class ConcurrentSound: NSObject {
   private var loopSound = [String: Bool]()
   
   override init() {
-    let audioSession = AVAudioSession.sharedInstance()
-    try! audioSession.setCategory(AVAudioSession.Category.playback)
+      do {
+          let audioSession = AVAudioSession.sharedInstance()
+          try audioSession.setCategory(AVAudioSession.Category.playback)
+      } catch {
+          print("Failed to initialize audio player: \(error.localizedDescription)")
+      }
   }
   
   @objc static func requiresMainQueueSetup() -> Bool {
     return true
   }
+
   @objc(load:uri:volume:loop:withResolver:withRejecter:)
   func load(key: String, uri: String, volume: Float, loop: Bool, resolve:RCTPromiseResolveBlock, reject:RCTPromiseRejectBlock) -> Void {
     
@@ -30,7 +35,6 @@ class ConcurrentSound: NSObject {
     loopSound[key] = loop
     let player = AVPlayerPool.playerWithUri(key: key)
     if(loadSoundStatus[key] == true){
-      // resolve((player.currentItem?.asset.duration.seconds)!*1000) //miliseconds
       if let currentItem = player.currentItem {
         let duration = currentItem.asset.duration.seconds
         if duration.isFinite {
@@ -43,6 +47,7 @@ class ConcurrentSound: NSObject {
       }
       return
     }
+
     loadSoundStatus[key] = true
     var url: URL?
     if(uri.starts(with: "http") || uri.starts(with: "file://")) {
@@ -51,19 +56,17 @@ class ConcurrentSound: NSObject {
     
     if(url != nil) {
       let playerItem = AVPlayerItem(url: url!)
-      
       player.replaceCurrentItem(with: playerItem)
-      
     }
     player.volume = volume
     
-    // resolve((player.currentItem?.asset.duration.seconds)!*1000) //miliseconds
     if let currentItem = player.currentItem {
         let duration = currentItem.asset.duration.seconds
         resolve(duration * 1000)  // Convert to milliseconds
     } else {
         reject("PLAYER_ERROR", "Current item is nil", nil)
     }
+
     NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: player.currentItem,
                                            queue: .main, using: {notification in
       ConcurrentSoundEmitter.emitter.sendEvent(withName: "OnSoundEnd", body: ["key": key])
@@ -84,11 +87,15 @@ class ConcurrentSound: NSObject {
   
   @objc(play:withResolver:withRejecter:)
   func play(key: String, resolve:RCTPromiseResolveBlock, reject:RCTPromiseRejectBlock) -> Void {
+    guard !key.isEmpty else {
+        reject("INVALID_KEY", "The provided key is empty.", nil)
+        return
+    }
+
     let player = AVPlayerPool.playerWithUri(key: key)
-    player.play()
     
-    // resolve((player.currentItem?.asset.duration.seconds)!*1000) //miliseconds
     if let currentItem = player.currentItem {
+        player.play()
         let duration = currentItem.asset.duration.seconds
         resolve(duration * 1000)  // Convert to milliseconds
     } else {
